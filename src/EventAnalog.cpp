@@ -1,7 +1,13 @@
+/**
+ *
+ * GPLv2 Licence https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ * 
+ * Copyright (c) 2022 Philip Fletcher <philip.fletcher@stutchbury.com> 
+ * 
+ */
+
+
 #include "EventAnalog.h"
-
-
-
 
 EventAnalog::EventAnalog(byte analogPin) {
   this->analogPin = analogPin;
@@ -16,9 +22,12 @@ void EventAnalog::setChangedHandler(EventAnalogCallback f) { changed_cb = f; }
 void EventAnalog::setIdleHandler(EventAnalogCallback f) { idle_cb = f; }
 int16_t EventAnalog::position() { return currentPos; }
 int16_t EventAnalog::previousPosition() { return previousPos; }
+bool EventAnalog::hasChanged() { return _hasChanged; }
 
 void EventAnalog::update() {
   if ( _enabled || _allowRead ) {
+    _hasChanged = false;
+    int16_t readPos = currentPos;
     uint16_t readVal = analogRead(analogPin);
     if ( abs(startVal-readVal) > (startBoundary)) {
       // For joysticks, resistance either side of centre can be quite 
@@ -34,23 +43,28 @@ void EventAnalog::update() {
         if ( readVal < startVal) {
           if ( abs(readVal - previousVal) > sliceNeg ) { //Noise filtering as a bonus...
             previousVal = readVal;
-            currentPos = max( (((startVal-startBoundary-readVal)*-1)/sliceNeg), negativeIncrements*-1);
+            readPos = max( (((startVal-startBoundary-readVal)*-1)/sliceNeg), negativeIncrements*-1);
           }
         } else {
           if ( abs(readVal - previousVal) > slicePos ) {
             previousVal = readVal;
-            currentPos = min(((readVal-startBoundary-startVal)/slicePos), positiveIncrements);
+            readPos = min(((readVal-startBoundary-startVal)/slicePos), positiveIncrements);
+          }
           }
         }
       } else {
-        //Always set the centrePos to ensure event fires
-        currentPos = 0;
+      //Always set the readPos to 0 when within startBoundary
+      // to ensure event fires
+      readPos = 0;
         //@TODO periodically reset startVal
       }
-      if ( previousPos != currentPos ) {
+    if ( _enabled ) {
+      if ( currentPos != readPos ) {        
         previousPos = currentPos;
+        currentPos = readPos;
         lastEventMs = millis();
         idleFired = false;
+        _hasChanged = true;
         //Serial.printf("Pos: %i \n", currentPos);
         if (changed_cb != NULL) changed_cb(*this);
       }

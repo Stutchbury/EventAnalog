@@ -1,7 +1,13 @@
 /**
+ * An event based library for analog inputs - slice an analog range into 
+ * configurable number of increments and a callback will be fired on each 
+ * change of increment.
+ * Effective noise reduction built in.
+ * Also has an idle timeout callback.
  * 
- * Written for Teensy but tested on Arduino Uno and others.
+ * GPLv2 Licence https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
  * 
+ * Copyright (c) 2022 Philip Fletcher <philip.fletcher@stutchbury.com>
  * 
  */
 #include "Arduino.h"
@@ -59,6 +65,8 @@ class EventAnalog {
      * @return int16_t 
      */
     int16_t previousPosition();
+
+    bool hasChanged();
 
     /**
      * @brief Split the analog range into this number of slices.
@@ -200,6 +208,7 @@ class EventAnalog {
     unsigned int _userState = 0;
     bool _allowRead = false;
     bool _enabled = true;
+    bool _hasChanged = false;
 
 };
 

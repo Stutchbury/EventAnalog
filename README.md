@@ -1,6 +1,6 @@
 # EventAnalog
 
-An event based library for analog inputs - slice an analog range into configureable number of increments and a callback will be fired on each change of increment. 
+An event based library for analog inputs - slice an analog range into configurable number of increments and a callback will be fired on each change of increment. 
 
 Effective noise reduction built in.
 
@@ -107,6 +107,7 @@ From within your callback function:
 
 **```int16_t previousPosition()```** Returns the previous position - this is not the analog value but the mapped position of the increments you have defined.
 
+**```hasChanged()```** Returns ```true``` if position has changed since previous ```update()```.
 
 ### Timeout
 
