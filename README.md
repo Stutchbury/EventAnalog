@@ -2,11 +2,16 @@
 
 An event based library for analog inputs - slice an analog range into configurable number of increments and a callback will be fired on each change of increment. 
 
-Effective noise reduction built in.
+For many uses of analog input, the 1024 'slices' of the analog value are more than is necessary. This library allows you to reduce those 1024 slices to a more managable number, calling a handler function or method each time the slice position increments up or down.
 
-Also has an idle timeout callback.
+Start and end (or centre and edge) 'deadzones' can be configured.
 
-Follows the same principles as [EventButton](https://github.com/Stutchbury/EventButton) (but with far fewer events).
+This also provides effective noise reduction.
+
+As with my other event libraries, an idle timeout callback is included.
+
+This library follows the same principles as [EventButton](https://github.com/Stutchbury/EventButton) (but with far fewer events) and forms the basis of the [EventJoystick](https://github.com/Stutchbury/EventJoystick) library.
+
 
 ## INSTALLATION & DOWNLOAD
 Install via the Arduino Library Manager or download from [github](https://github.com/Stutchbury/EventAnalog).
