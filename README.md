@@ -21,7 +21,7 @@ Install via the Arduino Library Manager or download from [github](https://github
 ### INSTANTIATE
 
 ```cpp
-#include <EventButton.h>
+#include <EventAnalog.h>
 EventAnalog ea1(<ANALOG_PIN>);
 
 // Create one or more callback functions 
