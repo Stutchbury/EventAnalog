@@ -66,7 +66,6 @@ class EventAnalog {
      */
     int16_t previousPosition();
 
-    bool hasChanged();
 
     /**
      * @brief Split the analog range into this number of slices.
@@ -123,7 +122,7 @@ class EventAnalog {
      */
     void setIdleHandler(EventAnalogCallback f);    
 
-/**
+    /**
      * Set the idle timeout in ms (default 10000) 
      */
     void setIdleTimeout(unsigned int timeoutMs);
@@ -140,6 +139,15 @@ class EventAnalog {
      * eg ON, OFF, INACTIVE etc
      */
     void setUserState(unsigned int s);
+
+    /**
+     * @brief Returns true of the position of either EventAnalog
+     * axis has changed since previous update()
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool hasChanged();
 
     /**
      * Get the identifier (not unique, defaults to 0)

@@ -117,6 +117,10 @@ void EventAnalog::setNumPositiveIncrements(uint8_t numIncr /*=10*/) {
   setSlicePos();
 }
 
+void EventAnalog::setIdleTimeout(unsigned int timeoutMs) {
+  idleTimeout = timeoutMs;
+}
+
 unsigned int EventAnalog::userId() { return _userId; }
 
 unsigned int EventAnalog::userState() { return _userState; }
