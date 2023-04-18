@@ -2,7 +2,7 @@
  *
  * GPLv2 Licence https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
  * 
- * Copyright (c) 2022 Philip Fletcher <philip.fletcher@stutchbury.com> 
+ * Copyright (c) 2023 Philip Fletcher <philip.fletcher@stutchbury.com> 
  * 
  */
 
@@ -25,47 +25,37 @@ int16_t EventAnalog::previousPosition() { return previousPos; }
 bool EventAnalog::hasChanged() { return _hasChanged; }
 
 void EventAnalog::update() {
+  if (!_started) {
+    // Set the start position so we don't trigger an event before moving
+    readVal = analogRead(analogPin);
+    setReadPos(readVal - startVal);
+    currentPos = readPos;
+    previousPos = currentPos;
+    _started = true;
+  }
+
+
   if ( _enabled || _allowRead ) {
     _hasChanged = false;
-    int16_t readPos = currentPos;
-    uint16_t readVal = analogRead(analogPin);
-    if ( abs(startVal-readVal) > (startBoundary)) {
-      // For joysticks, resistance either side of centre can be quite 
-      // different ranges so we need to slice both sides
-      if ( readVal < minVal ) {
-        minVal = readVal;
-        setSliceNeg();
-      } else if ( readVal > maxVal ) {
-        maxVal = readVal;
-        setSlicePos();
-      }
-      if ( _enabled ) {
-        if ( readVal < startVal) {
-          if ( abs(readVal - previousVal) > sliceNeg ) { //Noise filtering as a bonus...
-            previousVal = readVal;
-            readPos = max( (((startVal-startBoundary-readVal)*-1)/sliceNeg), negativeIncrements*-1);
-          }
-        } else {
-          if ( abs(readVal - previousVal) > slicePos ) {
-            previousVal = readVal;
-            readPos = min(((readVal-startBoundary-startVal)/slicePos), positiveIncrements);
-          }
-          }
-        }
-      } else {
-      //Always set the readPos to 0 when within startBoundary
-      // to ensure event fires
-      readPos = 0;
-        //@TODO periodically reset startVal
-      }
-    if ( _enabled ) {
-      if ( currentPos != readPos ) {        
+    readVal = analogRead(analogPin);
+    // For joysticks, resistance either side of centre can be quite 
+    // different ranges so we need to slice both sides
+    if ( readVal < minVal ) {
+      minVal = readVal;
+      setSliceNeg();
+    } else if ( readVal > maxVal ) {
+      maxVal = readVal;
+      setSlicePos();
+    }
+
+    if ( _enabled && millis() > (rateLimitCounter + rateLimit) ) { 
+      setReadPos(readVal - startVal);
+      if ( currentPos != readPos ) {
         previousPos = currentPos;
         currentPos = readPos;
         lastEventMs = millis();
         idleFired = false;
         _hasChanged = true;
-        //Serial.printf("Pos: %i \n", currentPos);
         if (changed_cb != NULL) changed_cb(*this);
       }
       //fire idle timeout callback
@@ -73,7 +63,27 @@ void EventAnalog::update() {
         idleFired = true;
         idle_cb (*this);
       }
+      rateLimitCounter = millis();
     }
+  }
+}
+
+void EventAnalog::setReadPos(int16_t offset) {
+  if ( offset > startBoundary) { //Going up!
+    if ( abs(readVal - previousVal) > slicePos ) {
+      previousVal = readVal;
+      int16_t rawReadPos = ((readVal-startBoundary-startVal)/slicePos);
+      readPos = min(rawReadPos, (positiveIncrements));
+    }
+  } else if (abs(offset) > startBoundary) { //Going down
+    if ( abs(readVal - previousVal) > sliceNeg ) {
+      previousVal = readVal;
+      int16_t rawReadPos = ((startVal-startBoundary-readVal)/sliceNeg) * -1;
+      readPos = max(rawReadPos, (negativeIncrements*-1));
+    }
+  } else {
+    previousVal = readVal;
+    readPos = 0;
   }
 }
 
@@ -136,3 +146,6 @@ bool EventAnalog::isIdle() {
   //Return true if idle (whether idle callback defined or not)
   return (millis() - lastEventMs) > idleTimeout;
 }
+
+void EventAnalog::setRateLimit(uint16_t ms) { rateLimit = ms; }
+

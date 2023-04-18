@@ -25,9 +25,9 @@ Install via the Arduino Library Manager or download from [github](https://github
 EventAnalog ea1(<ANALOG_PIN>);
 
 // Create one or more callback functions 
-void onEa1Changed(EventAnalog& eb) {
+void onEa1Changed(EventAnalog& ea) {
   Serial.print("ea1 changed. Position: ");
-  Serial.println(eb.position());
+  Serial.println(ea.position());
 }
 ```
 
@@ -80,9 +80,9 @@ For an ESP8288/32 or Teensy you can also pass a class method - see ```ClassMetho
 
 **```setIdleHandler```** fires after the EventAnalog has been idle for ```setIdleTimeout(ms)``` (default 10 seconds).
 
-**```setNumIncrements(uint8_t)```** Split the analog range into this number of slices.
+**```setNumIncrements(uint8_t)```** Split the analog range into this number of slices. Note: This library is intended to reduce the usual 0-1024 range of ```analogRead()``` to a much smaller, more manageable number of 'slices'. Higher numbers may not produce accurate results.
 
-A changed callback will be fire each time the increment changes. 
+A changed callback will be fired each time the increment changes. 
 
 **```setNumNegativeIncrements(uint8_t)```** and **```setNumPositiveIncrements(uint8_t)```** Normally increments are set with ```setNumIncrements``` but you can also set the negative and positive sides individually.
 
@@ -93,16 +93,19 @@ A changed callback will be fire each time the increment changes.
 
 **```setEndBoundary(uint16_t)```** Again, used primarily for joysticks to create an outer 'deadzone' where joysticks are notoriously inconsistent. Parameter is the analog value, not the increment position.
 
+**```setRateLimit(uint16_t ms)```** EventAnalog callbacks are normally fired on every loop() but to limit the number of events fired when the potentiometer is moved quickly, you can set a rate limit here. Note: A high rate limit may reduce responsiveness.
 
 
 
 ### Setting id or user state 
 
-**```setUserId(unsigned int identifier)```** Set a user defined value to identify this EventAnalaog instance. Not used by the library and does not have to be unique (defaults to 0). Useful when multiple pins call the same handler.  
+**```setUserId(unsigned int identifier)```** Set a user defined value to identify this EventAnalog instance. Not used by the library and does not have to be unique (defaults to 0). Useful when multiple pins call the same handler.  
 Note: this is 'user' as in 'user of the library'. 
 
 
 **```setUserState(unsigned int state)```** Set a user defined state for this EventAnalog instance. Eg enum for ON, OFF, INACTIVE etc. Not used by the library.
+
+
 
 ### Read EventAnalog state
 

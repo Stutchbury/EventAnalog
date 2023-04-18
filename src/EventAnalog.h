@@ -7,7 +7,7 @@
  * 
  * GPLv2 Licence https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
  * 
- * Copyright (c) 2022 Philip Fletcher <philip.fletcher@stutchbury.com>
+ * Copyright (c) 2023 Philip Fletcher <philip.fletcher@stutchbury.com>
  * 
  */
 #include "Arduino.h"
@@ -184,6 +184,8 @@ class EventAnalog {
      */
     bool isIdle();
 
+    void setRateLimit(uint16_t ms);
+
   protected:
 
     EventAnalogCallback changed_cb = NULL;
@@ -193,19 +195,21 @@ class EventAnalog {
 
   private:
     byte analogPin = 0;
-    uint16_t startVal = 100;
-    uint16_t currentVal = startVal;
-    uint16_t previousVal = currentVal;
-    uint16_t minVal = 100;
-    uint16_t maxVal = 980;
-    uint16_t startBoundary = 50;
-    uint16_t endBoundary = 50;
+    int16_t startVal = 100;
+    int16_t readVal = startVal;
+    int16_t currentVal = startVal;
+    int16_t previousVal = currentVal;
+    int16_t minVal = 100;
+    int16_t maxVal = 980;
+    int16_t startBoundary = 50;
+    int16_t endBoundary = 50;
 
-    uint8_t negativeIncrements = 25;
-    uint8_t positiveIncrements = 25;
-    uint16_t sliceNeg = 10;
-    uint16_t slicePos = 10;
+    int16_t negativeIncrements = 25;
+    int16_t positiveIncrements = 25;
+    int16_t sliceNeg = 20;
+    int16_t slicePos = 20;
 
+    int16_t readPos = 0;
     int16_t currentPos = 0;
     int16_t previousPos = 0;
 
@@ -217,6 +221,12 @@ class EventAnalog {
     bool _allowRead = false;
     bool _enabled = true;
     bool _hasChanged = false;
+    bool _started = false;
+
+    uint16_t rateLimit = 0;
+    unsigned long rateLimitCounter = 0;   
+
+    void setReadPos(int16_t offset);
 
 };
 
