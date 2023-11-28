@@ -133,7 +133,15 @@ void EventAnalog::setIdleTimeout(unsigned int timeoutMs) {
 
 unsigned int EventAnalog::userId() { return _userId; }
 
+void EventAnalog::setUserId(unsigned int id) { 
+  _userId = id; 
+}
+
 unsigned int EventAnalog::userState() { return _userState; }
+
+void EventAnalog::setUserState(unsigned int state) { 
+  _userState = state; 
+}
 
 bool EventAnalog::enabled() { return _enabled; }
 
