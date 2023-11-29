@@ -1,6 +1,6 @@
 {
     "name": "EventAnalog",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Event based library for analog inputs. Slice an analog range into configurable increments and a callback will be fired on each change of increment. Effective noise reduction built in.",
     "keywords": "analog, event, potentometer",
     "repository":
