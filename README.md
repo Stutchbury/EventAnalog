@@ -1,5 +1,7 @@
 # EventAnalog
 
+> **The new version of EventAnalog can now be found in the [InputEvents library](https://github.com/Stutchbury/InputEvents).**
+
 An event based library for analog inputs - slice an analog range into configurable number of increments and a callback will be fired on each change of increment. 
 
 For many uses of analog input, the 1024 'slices' of the analog value are more than is necessary. This library allows you to reduce those 1024 slices to a more managable number, calling a handler function or method each time the slice position increments up or down.
